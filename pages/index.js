@@ -1,131 +1,127 @@
 import Head from 'next/head';
 import styles from '../styles/Home.module.css';
+import { useEffect, useRef } from 'react';
+
+const sounds = [
+  {
+    key: 'Q',
+    track: 'audio/Ane.m4a',
+  },
+  {
+    key: 'W',
+    track: 'audio/AsNuoruSventeSvest.m4a',
+  },
+  {
+    key: 'E',
+    track: 'audio/AsNuuuohruSventeSvest.m4a',
+  },
+  {
+    key: 'A',
+    track: 'audio/AteikSakau.m4a',
+  },
+  {
+    key: 'S',
+    track: 'audio/DuokCigarete.m4a',
+  },
+  {
+    key: 'D',
+    track: 'audio/Oioioioioi.m4a',
+  },
+  {
+    key: 'Z',
+    track: 'audio/PenkiusSimtus.m4a',
+  },
+  {
+    key: 'X',
+    track: 'audio/PiskIGalvaKoStovi.m4a',
+  },
+  {
+    key: 'C',
+    track: 'audio/TauOperacijaReikPadarytGalvos.m4a',
+  },
+];
+
+const DrumPad = ({ text, audio }) => {
+  const audioRef = useRef();
+
+  useEffect(() => {
+    const handleEnded = () => {
+      const parent = audioRef.current.parentNode;
+      parent.classList.remove(styles.active);
+
+      // Reset the display text to "Play a sound" when the sound finishes
+      const display = parent.parentNode;
+      display.querySelector('h1').innerText = "Play a sound";
+    };
+
+    audioRef.current.addEventListener('ended', handleEnded);
+
+    return () => {
+      audioRef.current.removeEventListener('ended', handleEnded);
+    };
+  }, []);
+
+  const playSound = () => {
+    audioRef.current.play();
+
+    const id = audioRef.current.id;
+
+    const parent = audioRef.current.parentNode;
+    parent.classList.add(styles.active);
+
+    const display = parent.parentNode;
+    display.querySelector('h1').innerText = `${id} is playing`;
+  };
+
+  return (
+    <div className={styles.drumPad} onClick={playSound} id={`drum-${text}`}>
+      {text}
+      <audio ref={audioRef} src={audio} className={styles.clip} id={text} />
+    </div>
+  );
+};
 
 export default function Home() {
+  const handleKeyDown = (e) => {
+    const id = e.key.toUpperCase();
+    const audio = document.getElementById(id);
+
+    if (audio) {
+      audio.currentTime = 0;
+      const parent = audio.parentNode;
+      parent.classList.add(styles.active);
+
+      const display = parent.parentNode;
+      display.querySelector('h1').innerText = `${id} is playing`;
+      audio.play();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   return (
-    <div className={styles.container}>
+    <>
       <Head>
-        <title>Create Next App</title>
+        <title>Drum Machine</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+        <div className={styles.container}>
+          <div id={styles.display} className={styles.display}>
+            <h1>Play a sound</h1>
+            {sounds.map((sound, index) => (
+              <DrumPad text={sound.key} key={index} audio={sound.track} />
+            ))}
+          </div>
         </div>
       </main>
-
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel" className={styles.logo} />
-        </a>
-      </footer>
-
-      <style jsx>{`
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        footer img {
-          margin-left: 0.5rem;
-        }
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          text-decoration: none;
-          color: inherit;
-        }
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family:
-            Menlo,
-            Monaco,
-            Lucida Console,
-            Liberation Mono,
-            DejaVu Sans Mono,
-            Bitstream Vera Sans Mono,
-            Courier New,
-            monospace;
-        }
-      `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family:
-            -apple-system,
-            BlinkMacSystemFont,
-            Segoe UI,
-            Roboto,
-            Oxygen,
-            Ubuntu,
-            Cantarell,
-            Fira Sans,
-            Droid Sans,
-            Helvetica Neue,
-            sans-serif;
-        }
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-    </div>
+    </>
   );
 }

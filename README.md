@@ -1,1 +1,2 @@
-This is a starter template for [Learn Next.js](https://nextjs.org/learn).
+#Drum Machine
+Redoing an old drum machine project on Next.js

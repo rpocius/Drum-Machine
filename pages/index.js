@@ -38,7 +38,7 @@ const sounds = [
   {
     key: 'C',
     track: 'audio/TauOperacijaReikPadarytGalvos.m4a',
-  },
+  }
 ];
 
 const DrumPad = ({ text, audio }) => {
@@ -49,7 +49,6 @@ const DrumPad = ({ text, audio }) => {
       const parent = audioRef.current.parentNode;
       parent.classList.remove(styles.active);
 
-      // Reset the display text to "Play a sound" when the sound finishes
       const display = parent.parentNode;
       display.querySelector('h1').innerText = "Play a sound";
     };
